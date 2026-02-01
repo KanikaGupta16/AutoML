@@ -11,6 +11,7 @@ Features:
 """
 
 import os
+import sys
 import json
 import subprocess
 import tempfile
@@ -20,6 +21,17 @@ from typing import Optional
 import requests
 
 from ..config import config
+
+
+def get_kaggle_path() -> str:
+    """Get the path to the kaggle executable in the same venv as Python."""
+    # Find kaggle in the same directory as the Python executable
+    python_dir = Path(sys.executable).parent
+    kaggle_path = python_dir / "kaggle"
+    if kaggle_path.exists():
+        return str(kaggle_path)
+    # Fallback to just "kaggle" and hope it's in PATH
+    return "kaggle"
 
 
 @dataclass
@@ -235,10 +247,11 @@ class DatasetDiscovery:
         Does a lightweight metadata check without downloading the full dataset.
         More lenient - tries multiple methods before rejecting.
         """
+        kaggle_cmd = get_kaggle_path()
         try:
             # Method 1: Try metadata check
             result = subprocess.run(
-                ["kaggle", "datasets", "metadata", "-d", dataset.ref, "-p", "/tmp"],
+                [kaggle_cmd, "datasets", "metadata", "-d", dataset.ref, "-p", "/tmp"],
                 capture_output=True,
                 text=True,
                 timeout=30,
@@ -258,7 +271,7 @@ class DatasetDiscovery:
 
             # Method 2: Try listing dataset files (more lenient)
             list_result = subprocess.run(
-                ["kaggle", "datasets", "files", "-d", dataset.ref],
+                [kaggle_cmd, "datasets", "files", "-d", dataset.ref],
                 capture_output=True,
                 text=True,
                 timeout=30,

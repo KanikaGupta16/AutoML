@@ -55,6 +55,7 @@ class Orchestrator:
         priority: str = "balanced",
         skip_training: bool = False,
         skip_benchmark: bool = False,
+        dataset_ref: Optional[str] = None,
     ) -> WorkflowResult:
         """
         Run the complete AutoML workflow.
@@ -64,6 +65,7 @@ class Orchestrator:
             priority: "speed", "accuracy", or "balanced"
             skip_training: Skip training if model exists
             skip_benchmark: Skip benchmarking
+            dataset_ref: Optional pre-selected dataset reference (skips discovery)
 
         Returns:
             WorkflowResult with all outputs
@@ -73,6 +75,8 @@ class Orchestrator:
         print("=" * 60)
         print(f"Task: {task_description}")
         print(f"Priority: {priority}")
+        if dataset_ref:
+            print(f"Pre-selected dataset: {dataset_ref}")
 
         # Generate task name
         task_name = self._generate_task_name(task_description)
@@ -86,21 +90,34 @@ class Orchestrator:
             benchmark=None,
         )
 
-        # Stage 1: Dataset Discovery (get ALL validated datasets for fallback)
+        # Stage 1: Dataset Discovery (skip if dataset_ref provided)
         print("\n" + "-" * 60)
         print("STAGE 1: Dataset Discovery")
         print("-" * 60)
 
         try:
-            all_datasets = self.dataset_discovery.discover_all(task_description)
-            if not all_datasets:
-                raise RuntimeError("No accessible datasets found")
-            dataset = all_datasets[0]  # Primary dataset
-            fallback_datasets = all_datasets[1:]  # Fallbacks for self-healing
-            result.dataset = dataset
-            print(f"\n  Primary: {dataset.ref}")
-            if fallback_datasets:
-                print(f"  Fallbacks: {[d.ref for d in fallback_datasets]}")
+            if dataset_ref:
+                # Use pre-selected dataset, skip discovery
+                print(f"  Using pre-selected dataset: {dataset_ref}")
+                dataset = DatasetInfo(
+                    ref=dataset_ref,
+                    title=dataset_ref.split("/")[-1] if "/" in dataset_ref else dataset_ref,
+                    is_validated=True,  # Already validated during discovery phase
+                )
+                fallback_datasets = []
+                result.dataset = dataset
+                print(f"\n  ✓ Dataset: {dataset.ref}")
+            else:
+                # Run full discovery
+                all_datasets = self.dataset_discovery.discover_all(task_description)
+                if not all_datasets:
+                    raise RuntimeError("No accessible datasets found")
+                dataset = all_datasets[0]  # Primary dataset
+                fallback_datasets = all_datasets[1:]  # Fallbacks for self-healing
+                result.dataset = dataset
+                print(f"\n  Primary: {dataset.ref}")
+                if fallback_datasets:
+                    print(f"  Fallbacks: {[d.ref for d in fallback_datasets]}")
         except Exception as e:
             result.error = f"Dataset discovery failed: {e}"
             print(f"\n✗ {result.error}")
@@ -241,7 +258,8 @@ def run_workflow(
     priority: str = "balanced",
     skip_training: bool = False,
     skip_benchmark: bool = False,
+    dataset_ref: Optional[str] = None,
 ) -> WorkflowResult:
     """Convenience function to run the workflow."""
     orchestrator = Orchestrator()
-    return orchestrator.run(task_description, priority, skip_training, skip_benchmark)
+    return orchestrator.run(task_description, priority, skip_training, skip_benchmark, dataset_ref)
