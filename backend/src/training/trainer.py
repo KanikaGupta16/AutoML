@@ -243,7 +243,7 @@ class Trainer:
         local_path = self.models_dir / model_filename
 
         try:
-            cmd = ["modal", "volume", "get", config.modal_volume_name, model_filename, str(local_path)]
+            cmd = ["modal", "volume", "get", "--force", config.modal_volume_name, model_filename, str(local_path)]
             print(f"    Running: {' '.join(cmd[:4])}...")
 
             result = subprocess.run(

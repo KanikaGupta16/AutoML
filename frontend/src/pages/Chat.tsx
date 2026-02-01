@@ -119,18 +119,18 @@ export default function Chat() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--color-bg)' }}>
       {/* Header */}
-      <header className="flex items-center justify-between px-8 py-4 border-b border-gray-100">
-        <Link to="/" className="flex items-center gap-2 text-gray-500 hover:text-black transition">
+      <header className="flex items-center justify-between px-8 py-4" style={{ borderBottom: '1px solid var(--color-border)' }}>
+        <Link to="/" className="flex items-center gap-2 transition" style={{ color: 'var(--color-text-muted)' }}>
           <ArrowLeft className="w-5 h-5" />
           <span className="font-medium">Back</span>
         </Link>
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-            <Zap className="w-5 h-5 text-black" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
+            <Zap className="w-5 h-5" style={{ color: 'var(--color-bg)' }} />
           </div>
-          <span className="text-xl font-bold">AutoML</span>
+          <span className="text-xl font-bold" style={{ color: 'var(--color-text)' }}>AutoML</span>
         </div>
         <div className="w-20" />
       </header>
@@ -140,27 +140,27 @@ export default function Chat() {
         <div className="w-full max-w-2xl space-y-4">
           {messages.length === 0 && (
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-yellow-400 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Zap className="w-8 h-8 text-black" />
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6" style={{ background: 'var(--color-accent)' }}>
+                <Zap className="w-8 h-8" style={{ color: 'var(--color-bg)' }} />
               </div>
-              <h1 className="text-4xl font-bold mb-2">What do you want to predict?</h1>
-              <p className="text-gray-500">Describe your goal. We'll handle the rest.</p>
+              <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>What do you want to predict?</h1>
+              <p style={{ color: 'var(--color-text-muted)' }}>Describe your goal. We'll handle the rest.</p>
             </div>
           )}
 
           {messages.map((msg, idx) => (
             <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               {msg.role === "user" ? (
-                <div className="bg-black text-white px-5 py-3 rounded-2xl rounded-br-md max-w-md">
+                <div className="px-5 py-3 rounded-2xl rounded-br-md max-w-md" style={{ background: 'var(--color-accent)', color: 'var(--color-bg)' }}>
                   {msg.content}
                 </div>
               ) : (
                 <div className="space-y-3 max-w-lg">
                   <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 bg-black rounded-xl flex items-center justify-center shrink-0">
-                      <Zap className="w-4 h-4 text-white" />
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
+                      <Zap className="w-4 h-4" style={{ color: 'var(--color-accent)' }} />
                     </div>
-                    <div className="bg-gray-100 px-5 py-3 rounded-2xl rounded-bl-md">
+                    <div className="px-5 py-3 rounded-2xl rounded-bl-md" style={{ background: 'var(--color-bg-elevated)', color: 'var(--color-text)' }}>
                       {msg.content}
                     </div>
                   </div>
@@ -170,7 +170,8 @@ export default function Chat() {
                         <button
                           key={s}
                           onClick={() => handleSend(s)}
-                          className="px-4 py-2 bg-white border-2 border-gray-200 rounded-full text-sm font-medium hover:border-gray-400 transition"
+                          className="px-4 py-2 rounded-full text-sm font-medium transition"
+                          style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}
                         >
                           {s}
                         </button>
@@ -184,14 +185,14 @@ export default function Chat() {
 
           {loading && (
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 bg-black rounded-xl flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
+                <Zap className="w-4 h-4" style={{ color: 'var(--color-accent)' }} />
               </div>
-              <div className="bg-gray-100 px-5 py-4 rounded-2xl rounded-bl-md">
+              <div className="px-5 py-4 rounded-2xl rounded-bl-md" style={{ background: 'var(--color-bg-elevated)' }}>
                 <div className="flex gap-1">
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--color-text-subtle)', animationDelay: "0ms" }} />
+                  <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--color-text-subtle)', animationDelay: "150ms" }} />
+                  <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--color-text-subtle)', animationDelay: "300ms" }} />
                 </div>
               </div>
             </div>
@@ -202,7 +203,7 @@ export default function Chat() {
       </main>
 
       {/* Input */}
-      <div className="border-t border-gray-100 px-8 py-4">
+      <div className="px-8 py-4" style={{ borderTop: '1px solid var(--color-border)' }}>
         <div className="max-w-2xl mx-auto relative">
           <input
             ref={inputRef}
@@ -212,12 +213,14 @@ export default function Chat() {
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="Describe what you want to predict..."
             disabled={loading}
-            className="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-gray-400 disabled:opacity-50"
+            className="w-full px-6 py-4 text-lg rounded-2xl focus:outline-none disabled:opacity-50"
+            style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
           />
           <button
             onClick={() => handleSend()}
             disabled={!input.trim() || loading}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black text-white disabled:bg-gray-200 disabled:text-gray-400 transition"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-3 rounded-xl transition disabled:opacity-30"
+            style={{ background: 'var(--color-accent)', color: 'var(--color-bg)' }}
           >
             <Send className="w-5 h-5" />
           </button>

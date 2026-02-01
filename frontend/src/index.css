@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --color-bg: #0a0a0b;
+  --color-bg: #000000;
   --color-bg-elevated: #111113;
   --color-bg-subtle: #18181b;
   --color-border: #27272a;
@@ -247,4 +247,10 @@ body {
 
 .animate-bounce {
   animation: bounce 0.6s infinite;
+}
+
+/* Input placeholder */
+input::placeholder {
+  color: var(--color-text-subtle);
+  opacity: 1;
 }

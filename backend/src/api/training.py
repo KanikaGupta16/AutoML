@@ -18,6 +18,39 @@ from ..config import config
 from ..orchestrator import Orchestrator
 
 
+def extract_kaggle_ref(url: str) -> Optional[str]:
+    """Extract Kaggle dataset reference from URL.
+
+    Handles both dataset URLs and competition URLs:
+    - https://www.kaggle.com/datasets/username/dataset-name → username/dataset-name
+    - https://www.kaggle.com/c/competition-name → None (competitions need special handling)
+    - https://www.kaggle.com/username/dataset-name → username/dataset-name
+    """
+    if not url or "kaggle.com" not in url:
+        return None
+
+    # Handle /datasets/ URLs (preferred)
+    if "kaggle.com/datasets/" in url:
+        parts = url.split("kaggle.com/datasets/")
+        if len(parts) > 1:
+            ref = parts[1].rstrip("/").split("?")[0]
+            # Ensure it has username/dataset format
+            if "/" in ref:
+                return ref
+
+    # Handle direct /username/dataset URLs (not /c/ competitions)
+    if "kaggle.com/" in url and "/c/" not in url and "/datasets/" not in url:
+        parts = url.split("kaggle.com/")
+        if len(parts) > 1:
+            path = parts[1].rstrip("/").split("?")[0]
+            # Must have exactly one slash (username/dataset)
+            if path.count("/") == 1 and not path.startswith(("c/", "code/", "discussion/")):
+                return path
+
+    # Competition URLs (/c/) don't have direct dataset refs
+    return None
+
+
 router = APIRouter(prefix="/training", tags=["Training"])
 
 # Thread pool for blocking ML tasks
@@ -168,27 +201,32 @@ async def start_training(request: TrainRequest):
                 if selected:
                     url = selected.get("url", "")
                     # Extract Kaggle dataset ref from URL
-                    if "kaggle.com/datasets/" in url:
-                        # Format: https://www.kaggle.com/datasets/username/dataset-name
-                        parts = url.split("kaggle.com/datasets/")
-                        if len(parts) > 1:
-                            ref = parts[1].rstrip("/").split("?")[0]
-                            dataset_ref = ref
-                            print(f"[Training] Using dataset from discovery: {dataset_ref}")
+                    dataset_ref = extract_kaggle_ref(url)
+                    if dataset_ref:
+                        print(f"[Training] Using dataset from discovery: {dataset_ref}")
 
-                # Fall back to sources with status=selected
+                # Fall back to sources with status=selected or backup (prefer datasets over competitions)
                 if not dataset_ref:
                     sources = project.get("sources", [])
+                    # First try selected sources
                     for source in sources:
                         if source.get("status") == "selected":
-                            url = source.get("url", "")
-                            if "kaggle.com/datasets/" in url:
-                                parts = url.split("kaggle.com/datasets/")
-                                if len(parts) > 1:
-                                    ref = parts[1].rstrip("/").split("?")[0]
-                                    dataset_ref = ref
-                                    print(f"[Training] Using dataset from discovery sources: {dataset_ref}")
-                                    break
+                            ref = extract_kaggle_ref(source.get("url", ""))
+                            if ref:
+                                dataset_ref = ref
+                                print(f"[Training] Using dataset from discovery sources: {dataset_ref}")
+                                break
+
+                    # If still no dataset, try backup sources (sorted by relevance)
+                    if not dataset_ref:
+                        backup_sources = [s for s in sources if s.get("status") == "backup"]
+                        backup_sources.sort(key=lambda x: x.get("relevance_score", 0), reverse=True)
+                        for source in backup_sources:
+                            ref = extract_kaggle_ref(source.get("url", ""))
+                            if ref:
+                                dataset_ref = ref
+                                print(f"[Training] Using backup dataset: {dataset_ref}")
+                                break
         except Exception as e:
             print(f"[Training] Error fetching discovery project: {e}")
 

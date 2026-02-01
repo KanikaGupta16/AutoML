@@ -143,24 +143,24 @@ export default function Crawler() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{ background: 'var(--color-bg)' }}>
       {/* Header */}
-      <header className="flex items-center justify-between px-8 py-4 border-b border-gray-100">
+      <header className="flex items-center justify-between px-8 py-4" style={{ borderBottom: '1px solid var(--color-border)' }}>
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-            <Zap className="w-5 h-5 text-black" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
+            <Zap className="w-5 h-5" style={{ color: 'var(--color-bg)' }} />
           </div>
-          <span className="text-xl font-bold">AutoML</span>
+          <span className="text-xl font-bold" style={{ color: 'var(--color-text)' }}>AutoML</span>
         </Link>
         <nav className="flex items-center gap-6">
-          <Link to="/crawler" className="text-black font-medium">Crawler</Link>
-          <Link to="/training" className="text-gray-600 hover:text-black transition">Training</Link>
+          <Link to="/crawler" className="font-medium" style={{ color: 'var(--color-text)' }}>Crawler</Link>
+          <Link to="/training" className="transition" style={{ color: 'var(--color-text-muted)' }}>Training</Link>
         </nav>
       </header>
 
       <main className="max-w-3xl mx-auto px-8 py-12">
-        <h1 className="text-3xl font-bold mb-2">Data Pipeline</h1>
-        <p className="text-gray-500 mb-8">Search, crawl, and prepare your training data</p>
+        <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>Data Pipeline</h1>
+        <p className="mb-8" style={{ color: 'var(--color-text-muted)' }}>Search, crawl, and prepare your training data</p>
 
         {/* Input */}
         {!isRunning && !isComplete && (
@@ -172,11 +172,13 @@ export default function Crawler() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleStart()}
                 placeholder="Describe what data you need..."
-                className="flex-1 px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-gray-400"
+                className="flex-1 px-5 py-3 rounded-xl focus:outline-none"
+                style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
               />
               <button
                 onClick={handleStart}
-                className="px-6 py-3 bg-black text-white rounded-xl font-medium flex items-center gap-2 hover:bg-gray-800 transition"
+                className="px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition"
+                style={{ background: 'var(--color-accent)', color: 'var(--color-bg)' }}
               >
                 <Play className="w-5 h-5" />
                 Start
@@ -196,18 +198,26 @@ export default function Crawler() {
           {steps.map((step, idx) => (
             <div
               key={step.id}
-              className={`flex items-center gap-4 p-4 rounded-xl border-2 ${
-                step.status === "completed"
-                  ? "border-green-200 bg-green-50"
+              className="flex items-center gap-4 p-4 rounded-xl"
+              style={{
+                background: step.status === "completed"
+                  ? "rgba(34, 197, 94, 0.1)"
                   : step.status === "running"
-                  ? "border-yellow-200 bg-yellow-50"
-                  : "border-gray-100 bg-gray-50"
-              }`}
+                  ? "rgba(250, 204, 21, 0.1)"
+                  : "var(--color-bg-elevated)",
+                border: `1px solid ${
+                  step.status === "completed"
+                    ? "rgba(34, 197, 94, 0.3)"
+                    : step.status === "running"
+                    ? "rgba(250, 204, 21, 0.3)"
+                    : "var(--color-border)"
+                }`
+              }}
             >
               {getIcon(step.status)}
               <div className="flex-1">
-                <p className="font-medium">{step.title}</p>
-                {step.detail && <p className="text-sm text-gray-500">{step.detail}</p>}
+                <p className="font-medium" style={{ color: 'var(--color-text)' }}>{step.title}</p>
+                {step.detail && <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{step.detail}</p>}
               </div>
             </div>
           ))}
@@ -216,43 +226,44 @@ export default function Crawler() {
         {/* Stats */}
         {data && (
           <div className="mt-8 grid grid-cols-4 gap-4">
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <p className="text-sm text-gray-500">Sources</p>
-              <p className="text-2xl font-bold">{data.stats.total_sources}</p>
+            <div className="p-4 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
+              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Sources</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>{data.stats.total_sources}</p>
             </div>
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <p className="text-sm text-gray-500">Validated</p>
-              <p className="text-2xl font-bold">{data.stats.validated}</p>
+            <div className="p-4 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
+              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Validated</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>{data.stats.validated}</p>
             </div>
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <p className="text-sm text-gray-500">High Quality</p>
-              <p className="text-2xl font-bold">{data.high_quality_sources?.length || 0}</p>
+            <div className="p-4 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
+              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>High Quality</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>{data.high_quality_sources?.length || 0}</p>
             </div>
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <p className="text-sm text-gray-500">Rejected</p>
-              <p className="text-2xl font-bold">{data.stats.rejected}</p>
+            <div className="p-4 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
+              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Rejected</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>{data.stats.rejected}</p>
             </div>
           </div>
         )}
 
         {/* Complete */}
         {isComplete && (
-          <div className="mt-8 p-6 bg-green-50 border-2 border-green-200 rounded-xl">
+          <div className="mt-8 p-6 rounded-xl" style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
                   <CheckCircle2 className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold">Data Ready!</h3>
-                  <p className="text-gray-600">
+                  <h3 className="font-bold" style={{ color: 'var(--color-text)' }}>Data Ready!</h3>
+                  <p style={{ color: 'var(--color-text-muted)' }}>
                     {data?.stats.validated} sources validated. Ready to train your model.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => navigate("/training", { state: { task: input, projectId } })}
-                className="px-6 py-3 bg-black text-white rounded-xl font-medium flex items-center gap-2 hover:bg-gray-800 transition"
+                className="px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition"
+                style={{ background: 'var(--color-accent)', color: 'var(--color-bg)' }}
               >
                 Continue to Training
                 <ArrowRight className="w-5 h-5" />
